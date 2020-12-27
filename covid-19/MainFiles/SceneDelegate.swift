@@ -8,8 +8,9 @@
 import UIKit
 import CoreLocation
 import UserNotifications
+import NotificationCenter
 
-class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelegate {
+class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelegate, UNUserNotificationCenterDelegate {
 
     var window: UIWindow?
     static let geoCoder = CLGeocoder()
@@ -36,15 +37,37 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
         
         center.requestAuthorization(options: [.alert, .sound]) { granted, error in
         }
+        //MARK: Notificatoin prepare
+        let snoozeAction = UNNotificationAction(identifier: "snooze", title: "Snooze")
+        let deleteAction = UNNotificationAction(identifier: "delete", title: "Delete", options: [.destructive])
+        let center = UNUserNotificationCenter.current()
+                center.requestAuthorization(options: [.alert, .badge]){granted, error in
+            if (granted){
+                let category = UNNotificationCategory(
+                    identifier: "LocationRegionOnExit",
+                    actions: [snoozeAction, deleteAction],
+                    intentIdentifiers: [],
+                    options: [])
+                center.setNotificationCategories([category])
+                
+            }
+            
+           // if let error = error{}
+            center.delegate = self
+        }
         
         //MARK: Try to get saved Location
         
         if let previousLocationEncoded = UserDefaults.standard.object(forKey: "savedLocation") as? Data {
         let previousLocationDecoded = NSKeyedUnarchiver.unarchiveObject(with: previousLocationEncoded) as! CLLocation
             homeLocation = previousLocationDecoded
+            locationManager.startMonitoring(for: CLCircularRegion(center: homeLocation.coordinate, radius: 100, identifier: "Home area"))
+        print(homeLocation)
         }
-            locationManager.requestAlwaysAuthorization()
+       
+        locationManager.requestAlwaysAuthorization()
         locationManager.delegate = self
+        
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -76,10 +99,25 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
     }
 
     func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion){
-        if homeLocation != nil {
-            
-        }
-    }
+        let content = UNMutableNotificationContent()
+        content.categoryIdentifier = "LocationRegionOnExit"
+                content.title = "Your live home!"
+                content.body = "Do not forget: antiseptic  and mask!"
+                content.sound = .defaultCritical
+              //  content.badge = 2
 
+                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0, repeats: false)
+
+                let request = UNNotificationRequest(
+                    identifier: "notification-id",
+                    content: content,
+                    trigger: trigger
+                )
+        UNUserNotificationCenter.current().add(request)
+        
+    }
+    func locationManager(_ manager: CLLocationManager, didStartMonitoringFor region: CLRegion) {
+ 
+    }
 }
 
