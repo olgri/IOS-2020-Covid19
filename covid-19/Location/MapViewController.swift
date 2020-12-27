@@ -11,11 +11,28 @@ import CoreLocation
 class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDelegate {
     let mapView =  MKMapView()
     let locationManager = CLLocationManager()
+    let locationTextField = UITextField()
+    var homeLocation = CLLocation()
     
   override func viewDidLoad() {
     super.viewDidLoad()
-    mapView.frame=self.view.frame
+    self.view.backgroundColor = .white
+    
+    self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Save position", style: .plain, target: self, action: #selector(savePositionTapped))
+    
+    mapView.frame = CGRect(x: self.view.frame.minX, y: 0.2*self.view.frame.height, width: self.view.frame.width, height: 0.8*self.view.frame.height)
     self.view.addSubview(mapView)
+    
+    locationTextField.frame = CGRect(x: self.view.frame.minX+10, y: mapView.frame.minY-45, width: self.view.frame.width-15, height: 35)
+    locationTextField.placeholder = "Print your address"
+    locationTextField.borderStyle = UITextField.BorderStyle.roundedRect
+    locationTextField.keyboardType = UIKeyboardType.default
+    locationTextField.returnKeyType = UIReturnKeyType.done
+    locationTextField.clearButtonMode = UITextField.ViewMode.whileEditing
+    locationTextField.font = UIFont.boldSystemFont(ofSize: 21)
+    locationTextField.addTarget(self, action: #selector(locationTextFieldEdit), for: .editingChanged)
+    self.view.addSubview(locationTextField)
+    
     
     self.locationManager.requestAlwaysAuthorization()
 
@@ -23,12 +40,11 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         self.locationManager.requestWhenInUseAuthorization()
 
         if CLLocationManager.locationServicesEnabled() {
-            print("Local service enabled")
             locationManager.delegate = self
             locationManager.desiredAccuracy = kCLLocationAccuracyBest
             locationManager.startUpdatingLocation()
         }
-    locationManager.delegate = self
+        locationManager.delegate = self
         mapView.delegate = self
         mapView.mapType = .standard
         mapView.isZoomEnabled = true
@@ -40,12 +56,52 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         }
   }
   
-  @IBAction func addItemPressed(_ sender: Any) {
+    @objc func savePositionTapped(){
+        let encodedLocation = NSKeyedArchiver.archivedData(withRootObject: homeLocation)
+        UserDefaults.standard.set(encodedLocation, forKey: "savedLocation")
+        self.navigationController?.popToRootViewController(animated: true)
+    }
     
-  }
+    @objc func locationTextFieldEdit(){
+        let geocoder = CLGeocoder()
+        if let address = locationTextField.text {
+            locationManager.stopUpdatingLocation()
+            geocoder.geocodeAddressString(address) { (placemarks, error) in
+                if error != nil {
+                  //if error
+                  print("!!!!!!!!!!ERROR!!!!!!!!!!")
+                } else if let placemarks = placemarks {
+
+                  if let coordinate = placemarks.first?.location?.coordinate {
+                    let annotation = MKPointAnnotation()
+                    annotation.coordinate = coordinate
+                    annotation.title = "Home"
+                    annotation.subtitle = "Home"
+                    self.mapView.addAnnotation(annotation)
+
+                    //centerMap(locValue)
+                
+                      self.mapView.setCenter(coordinate, animated: true)
+                  }
+                  }
+                }
+        
+        } else {
+            
+            locationManager.startUpdatingLocation()
+        }
+          
+        }
+        
+
+    
+
+    
+
    
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        let locValue:CLLocationCoordinate2D = manager.location!.coordinate
+        homeLocation = manager.location!
+        let locValue:CLLocationCoordinate2D = homeLocation.coordinate
 
         mapView.mapType = MKMapType.standard
 
@@ -58,7 +114,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         annotation.title = "Home"
         annotation.subtitle = "Home"
         mapView.addAnnotation(annotation)
-
-        //centerMap(locValue)
+            
+        
     }
 }

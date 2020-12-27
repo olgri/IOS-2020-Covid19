@@ -4,7 +4,7 @@
 //
 //  Created by Oleg Gribovsky on 10/31/20.
 //
-
+//AppMetrica key:0a9b83dc-c715-4a80-99df-090668126e88
 import UIKit
 import CoreLocation
 import UserNotifications
@@ -15,6 +15,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
     static let geoCoder = CLGeocoder()
     let center = UNUserNotificationCenter.current()
     let locationManager = CLLocationManager()
+    var homeLocation = CLLocation()
+    
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
@@ -34,9 +36,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
         
         center.requestAuthorization(options: [.alert, .sound]) { granted, error in
         }
-        locationManager.requestAlwaysAuthorization()
         
-        locationManager.startMonitoringVisits()
+        //MARK: Try to get saved Location
+        
+        if let previousLocationEncoded = UserDefaults.standard.object(forKey: "savedLocation") as? Data {
+        let previousLocationDecoded = NSKeyedUnarchiver.unarchiveObject(with: previousLocationEncoded) as! CLLocation
+            homeLocation = previousLocationDecoded
+        }
+            locationManager.requestAlwaysAuthorization()
         locationManager.delegate = self
     }
 
@@ -68,8 +75,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
         // to restore the scene back to its current state.
     }
 
-    func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
-        // Сообщение об ошибках
+    func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion){
+        if homeLocation != nil {
+            
+        }
     }
 
 }
