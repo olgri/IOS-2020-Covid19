@@ -20,9 +20,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
   //  var notificationAccessGranted = false
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
-        // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
-        // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
         let window = UIWindow(windowScene: windowScene)
@@ -82,30 +79,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
     
     
  
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        print("Current location \(locations[0])")
-        print("Home location \(homeLocation)")
-    }
- 
     func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion){
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
-        showNotification(inpTrigger: trigger)
-
-        print("!!!!!!!!!!!! ??????????  "+region.identifier)
+        showNotification()
         
     }
-    func showNotification (inpTrigger: UNTimeIntervalNotificationTrigger) {
-        let locationTrigger = inpTrigger
-        
-        let locationContent = UNMutableNotificationContent()
-        locationContent.title = "#STAYONLINE"
-        locationContent.body = "Don't forget antiseptic and mask!!!"
-        //locationContent.sound = UNNotificationSound.default()
-        
-        // Создание запроса уведомления
+    func showNotification () {
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+                
+        let notificationContent = UNMutableNotificationContent()
+        notificationContent.title = "#STAYONLINE"
+        notificationContent.body = "Don't forget antiseptic and mask!!!"
+        notificationContent.sound = UNNotificationSound.default
         let request = UNNotificationRequest(identifier: "myId",
-                                            content: locationContent,
-                                            trigger: locationTrigger)
+                                            content: notificationContent,
+                                            trigger: trigger)
         
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
         UNUserNotificationCenter.current().add(request) {(error) in
@@ -114,6 +101,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
             }
         }
     }
-
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.alert, .sound])
+    }
 }
 
