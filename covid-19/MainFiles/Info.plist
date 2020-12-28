@@ -60,9 +60,9 @@
 	</array>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string></string>
+	<key>FirebaseAutomaticScreenReportingEnabled</key>
+	<false/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
-	<key>FirebaseAutomaticScreenReportingEnabled</key>
-	<string>NO</string>
 </dict>
 </plist>

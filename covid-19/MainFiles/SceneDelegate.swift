@@ -17,7 +17,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
     let center = UNUserNotificationCenter.current()
     let locationManager = CLLocationManager()
     var homeLocation = CLLocation()
-    
+  //  var notificationAccessGranted = false
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
@@ -34,90 +34,86 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
         
         
         //MARK: LocationAuthorisation
+        if userGrantAccessAppToNotifications() {
+            print("!!!!!!!!!!!!!!!Получено разрешение на отправку уведомлений!")
+        }
+        if userGrantAccessAppToLocation() {
+            locationManager.startUpdatingLocation()
+        }
+        locationManager.delegate = self
+        center.delegate = self
         
-        center.requestAuthorization(options: [.alert, .sound]) { granted, error in
-        }
-        //MARK: Notificatoin prepare
-        let snoozeAction = UNNotificationAction(identifier: "snooze", title: "Snooze")
-        let deleteAction = UNNotificationAction(identifier: "delete", title: "Delete", options: [.destructive])
-        let center = UNUserNotificationCenter.current()
-                center.requestAuthorization(options: [.alert, .badge]){granted, error in
-            if (granted){
-                let category = UNNotificationCategory(
-                    identifier: "LocationRegionOnExit",
-                    actions: [snoozeAction, deleteAction],
-                    intentIdentifiers: [],
-                    options: [])
-                center.setNotificationCategories([category])
-                
-            }
-            
-           // if let error = error{}
-            center.delegate = self
-        }
+   
         
         //MARK: Try to get saved Location
         
         if let previousLocationEncoded = UserDefaults.standard.object(forKey: "savedLocation") as? Data {
         let previousLocationDecoded = NSKeyedUnarchiver.unarchiveObject(with: previousLocationEncoded) as! CLLocation
             homeLocation = previousLocationDecoded
-            locationManager.startMonitoring(for: CLCircularRegion(center: homeLocation.coordinate, radius: 100, identifier: "Home area"))
-        print(homeLocation)
+           // locationManager.startMonitoring(for: CLCircularRegion(center: homeLocation.coordinate, radius: 100, identifier: "Home area"))
+        print("!!!!!!!!!!!!!!!!!!!!!\(homeLocation)")
+            // Define the content of the notification
+          
+          //  content.sound = UNNotificationSound(named: ")
+
+            // Define the region
+            let region = CLCircularRegion(center: homeLocation.coordinate, radius: 100, identifier: "Home region")
+            region.notifyOnEntry = false
+            region.notifyOnExit = true
+            locationManager.startMonitoring(for: region)
         }
-       
-        locationManager.requestAlwaysAuthorization()
-        locationManager.delegate = self
         
     }
 
-    func sceneDidDisconnect(_ scene: UIScene) {
-        // Called as the scene is being released by the system.
-        // This occurs shortly after the scene enters the background, or when its session is discarded.
-        // Release any resources associated with this scene that can be re-created the next time the scene connects.
-        // The scene may re-connect later, as its session was not necessarily discarded (see `application:didDiscardSceneSessions` instead).
-    }
-
-    func sceneDidBecomeActive(_ scene: UIScene) {
-        // Called when the scene has moved from an inactive state to an active state.
-        // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
-    }
-
-    func sceneWillResignActive(_ scene: UIScene) {
-        // Called when the scene will move from an active state to an inactive state.
-        // This may occur due to temporary interruptions (ex. an incoming phone call).
-    }
-
-    func sceneWillEnterForeground(_ scene: UIScene) {
-        // Called as the scene transitions from the background to the foreground.
-        // Use this method to undo the changes made on entering the background.
-    }
-
-    func sceneDidEnterBackground(_ scene: UIScene) {
-        // Called as the scene transitions from the foreground to the background.
-        // Use this method to save data, release shared resources, and store enough scene-specific state information
-        // to restore the scene back to its current state.
-    }
-
-    func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion){
-        let content = UNMutableNotificationContent()
-        content.categoryIdentifier = "LocationRegionOnExit"
-                content.title = "Your live home!"
-                content.body = "Do not forget: antiseptic  and mask!"
-                content.sound = .defaultCritical
-              //  content.badge = 2
-
-                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0, repeats: false)
-
-                let request = UNNotificationRequest(
-                    identifier: "notification-id",
-                    content: content,
-                    trigger: trigger
-                )
-        UNUserNotificationCenter.current().add(request)
+    func userGrantAccessAppToNotifications() -> Bool{
+        var accessGranted = false
+        center.requestAuthorization(options: [.alert, .sound]) {
+                    (accepted, error) in
+                    accessGranted = accepted
+            }
+        return accessGranted
         
     }
-    func locationManager(_ manager: CLLocationManager, didStartMonitoringFor region: CLRegion) {
+    
+    func userGrantAccessAppToLocation() -> Bool{
+        locationManager.requestWhenInUseAuthorization()
+        return true
+    }
+    
+    
  
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        print("Current location \(locations[0])")
+        print("Home location \(homeLocation)")
     }
+ 
+    func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion){
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        showNotification(inpTrigger: trigger)
+
+        print("!!!!!!!!!!!! ??????????  "+region.identifier)
+        
+    }
+    func showNotification (inpTrigger: UNTimeIntervalNotificationTrigger) {
+        let locationTrigger = inpTrigger
+        
+        let locationContent = UNMutableNotificationContent()
+        locationContent.title = "#STAYONLINE"
+        locationContent.body = "Don't forget antiseptic and mask!!!"
+        //locationContent.sound = UNNotificationSound.default()
+        
+        // Создание запроса уведомления
+        let request = UNNotificationRequest(identifier: "myId",
+                                            content: locationContent,
+                                            trigger: locationTrigger)
+        
+        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+        UNUserNotificationCenter.current().add(request) {(error) in
+            if let error = error {
+                print("ошибка с запросом: \(error)")
+            }
+        }
+    }
+
 }
 
