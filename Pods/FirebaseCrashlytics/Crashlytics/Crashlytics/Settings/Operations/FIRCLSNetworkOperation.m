@@ -44,7 +44,7 @@
 }
 
 - (void)startWithToken:(FIRCLSDataCollectionToken *)token {
-  // Settings is considered data collection, so we must only
+  // Settings and Onboarding are considered data collection, so we must only
   // call this with a valid token
   if (![token isValid]) {
     FIRCLSErrorLog(@"Skipping network operation with invalid data collection token");

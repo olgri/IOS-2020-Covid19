@@ -59,7 +59,7 @@
 
 #import "Crashlytics/Crashlytics/Models/FIRCLSExecutionIdentifierModel.h"
 #import "Crashlytics/Crashlytics/Models/FIRCLSInstallIdentifierModel.h"
-#import "Crashlytics/Crashlytics/Settings/FIRCLSSettingsManager.h"
+#import "Crashlytics/Crashlytics/Settings/FIRCLSSettingsOnboardingManager.h"
 #import "Crashlytics/Shared/FIRCLSConstants.h"
 
 #import "Crashlytics/Crashlytics/Controllers/FIRCLSReportManager_Private.h"
@@ -171,8 +171,8 @@ typedef NSNumber FIRCLSWrappedBool;
 // Settings fetched from the server
 @property(nonatomic, strong) FIRCLSSettings *settings;
 
-// Runs the operations that fetch settings
-@property(nonatomic, strong) FIRCLSSettingsManager *settingsManager;
+// Runs the operations that fetch settings and call onboarding endpoints
+@property(nonatomic, strong) FIRCLSSettingsOnboardingManager *settingsAndOnboardingManager;
 
 @property(nonatomic, strong) GDTCORTransport *googleTransport;
 
@@ -226,11 +226,12 @@ static void (^reportSentCallback)(void);
   _settings = settings;
   _appIDModel = appIDModel;
 
-  _settingsManager = [[FIRCLSSettingsManager alloc] initWithAppIDModel:appIDModel
-                                                        installIDModel:self.installIDModel
-                                                              settings:self.settings
-                                                           fileManager:self.fileManager
-                                                           googleAppID:self.googleAppID];
+  _settingsAndOnboardingManager =
+      [[FIRCLSSettingsOnboardingManager alloc] initWithAppIDModel:appIDModel
+                                                   installIDModel:self.installIDModel
+                                                         settings:self.settings
+                                                      fileManager:self.fileManager
+                                                      googleAppID:self.googleAppID];
 
   return self;
 }
@@ -359,7 +360,7 @@ static void (^reportSentCallback)(void);
     FIRCLSDebugLog(@"Unsent reports will be uploaded at startup");
     FIRCLSDataCollectionToken *dataCollectionToken = [FIRCLSDataCollectionToken validToken];
 
-    [self beginSettingsWithToken:dataCollectionToken waitForSettingsRequest:NO];
+    [self beginSettingsAndOnboardingWithToken:dataCollectionToken waitForSettingsRequest:NO];
 
     [self beginReportUploadsWithToken:dataCollectionToken
                preexistingReportPaths:preexistingReportPaths
@@ -397,8 +398,8 @@ static void (^reportSentCallback)(void);
                  BOOL waitForSetting =
                      !self.settings.shouldUseNewReportEndpoint && !self.settings.orgID;
 
-                 [self beginSettingsWithToken:dataCollectionToken
-                       waitForSettingsRequest:waitForSetting];
+                 [self beginSettingsAndOnboardingWithToken:dataCollectionToken
+                                    waitForSettingsRequest:waitForSetting];
 
                  [self beginReportUploadsWithToken:dataCollectionToken
                             preexistingReportPaths:preexistingReportPaths
@@ -453,16 +454,16 @@ static void (^reportSentCallback)(void);
   }];
 }
 
-- (void)beginSettingsWithToken:(FIRCLSDataCollectionToken *)token
-        waitForSettingsRequest:(BOOL)waitForSettings {
+- (void)beginSettingsAndOnboardingWithToken:(FIRCLSDataCollectionToken *)token
+                     waitForSettingsRequest:(BOOL)waitForSettings {
   if (self.settings.isCacheExpired) {
     // This method can be called more than once if the user calls
     // SendUnsentReports again, so don't repeat the settings fetch
     static dispatch_once_t settingsFetchOnceToken;
     dispatch_once(&settingsFetchOnceToken, ^{
-      [self.settingsManager beginSettingsWithGoogleAppId:self.googleAppID
-                                                   token:token
-                                       waitForCompletion:waitForSettings];
+      [self.settingsAndOnboardingManager beginSettingsAndOnboardingWithGoogleAppId:self.googleAppID
+                                                                             token:token
+                                                                 waitForCompletion:waitForSettings];
     });
   }
 }

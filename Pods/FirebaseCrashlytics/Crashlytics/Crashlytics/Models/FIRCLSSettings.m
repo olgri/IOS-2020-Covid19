@@ -261,6 +261,20 @@ NSString *const AppVersion = @"app_version";
   return self.fabricSettings[@"bundle_id"];
 }
 
+#pragma mark - Onboarding / Update
+
+- (NSString *)appStatus {
+  return self.appSettings[@"status"];
+}
+
+- (BOOL)appNeedsOnboarding {
+  return [self.appStatus isEqualToString:@"new"];
+}
+
+- (BOOL)appUpdateRequired {
+  return [[self.appSettings objectForKey:@"update_required"] boolValue];
+}
+
 #pragma mark - On / Off Switches
 
 - (BOOL)errorReportingEnabled {
