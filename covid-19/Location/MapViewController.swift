@@ -13,12 +13,13 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     let locationManager = CLLocationManager()
     let locationTextField = UITextField()
     var homeLocation = CLLocation()
+    let annotation = MKPointAnnotation() //Description of point
     
   override func viewDidLoad() {
     super.viewDidLoad()
     self.view.backgroundColor = .white
     
-    self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Save position", style: .plain, target: self, action: #selector(savePositionTapped))
+    self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Save location", style: .plain, target: self, action: #selector(savePositionTapped))
     
     mapView.frame = CGRect(x: self.view.frame.minX, y: 0.2*self.view.frame.height, width: self.view.frame.width, height: 0.8*self.view.frame.height)
     self.view.addSubview(mapView)
@@ -34,11 +35,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     self.view.addSubview(locationTextField)
     
     
-    self.locationManager.requestAlwaysAuthorization()
-
-        // For use in foreground
-        self.locationManager.requestWhenInUseAuthorization()
-
+    
         if CLLocationManager.locationServicesEnabled() {
             locationManager.delegate = self
             locationManager.desiredAccuracy = kCLLocationAccuracyBest
@@ -65,11 +62,9 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     @objc func locationTextFieldEdit(){
         let geocoder = CLGeocoder()
         if let address = locationTextField.text {
-            locationManager.stopUpdatingLocation()
+    
             geocoder.geocodeAddressString(address) { (placemarks, error) in
                 if error != nil {
-                  //if error
-                  print("!!!!!!!!!!ERROR!!!!!!!!!!")
                 } else if let placemarks = placemarks {
 
                   if let coordinate = placemarks.first?.location?.coordinate {
@@ -86,9 +81,6 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
                   }
                 }
         
-        } else {
-            
-            locationManager.startUpdatingLocation()
         }
           
         }
@@ -109,12 +101,11 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         let region = MKCoordinateRegion(center: locValue, span: span)
         mapView.setRegion(region, animated: true)
         
-        let annotation = MKPointAnnotation()
+       // mapView.removeAnnotation(annotation as Data)
         annotation.coordinate = locValue
         annotation.title = "Home"
-        annotation.subtitle = "Home"
+     //   annotation.subtitle = "Home"
         mapView.addAnnotation(annotation)
-            
         
     }
 }
