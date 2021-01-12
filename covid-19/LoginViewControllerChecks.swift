@@ -17,7 +17,7 @@ class CheckForValid{
         }
     }
     func isPasswordCountMoreThan7(passwordText: String) -> Bool {
-        if passwordText.count>8{
+        if passwordText.count>7{
             return true
         } else
         {

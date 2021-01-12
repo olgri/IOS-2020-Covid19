@@ -13,12 +13,13 @@ class LoginViewController: UIViewController {
     @IBOutlet private var loginButton: UIButton!
     //MARK:Save to UserDefaults
     let lastUserLoginKey = "lastSuccesLogin"
+    let checkForValid = CheckForValid()
     
-    func saveLastSuccessLoginInUserDefaults(login userLogin: String){ // Записывает последний усешный вход в программу
+    private func saveLastSuccessLoginInUserDefaults(login userLogin: String){ // Записывает последний усешный вход в программу
         UserDefaults.standard.setValue(userLogin, forKey: lastUserLoginKey)
     }
     
-    func loadLastSuccesLoginFromUserDefaults()->String!{ // Загружает последний успешный логин при вызове контроллера
+    private func loadLastSuccesLoginFromUserDefaults()->String!{ // Загружает последний успешный логин при вызове контроллера
         var lastLogin = ""
         if let lastLoginFromUserDefaults = UserDefaults.standard.string(forKey: lastUserLoginKey) {
             lastLogin = lastLoginFromUserDefaults
@@ -73,12 +74,16 @@ class LoginViewController: UIViewController {
         })
     }
     
-    @objc func userLoginEdit() {
-        if !loginTextField.isEmpty && !passwordTextField.isEmpty{
+    @objc private func userLoginEdit() {
+     /*   if !loginTextField.isEmpty && !passwordTextField.isEmpty{
             loginButton.isEnabled = true
         } else {
             loginButton.isEnabled = false
         }
+ */
+    //    if ((let loginText = loginTextField.text) && (let passwordText = passwordTextField.text)) {
+            
+      //  }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -90,7 +95,7 @@ class LoginViewController: UIViewController {
         self.loginButton.isEnabled = false
     }
 
-    @objc func userTryToLogin(){
+    @objc private func userTryToLogin(){
         if let loginSuccess = loginTextField.text {
             saveLastSuccessLoginInUserDefaults(login: loginSuccess)
         }
