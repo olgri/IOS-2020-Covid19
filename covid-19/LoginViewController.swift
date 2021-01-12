@@ -102,7 +102,7 @@ class LoginViewController: UIViewController {
     }
 }
 
-extension UITextField {
+/*extension UITextField {
     var isEmpty: Bool {
         if let text = self.text, !text.isEmpty {
              return false
@@ -110,3 +110,4 @@ extension UITextField {
         return true
     }
 }
+*/
