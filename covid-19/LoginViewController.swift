@@ -12,8 +12,8 @@ class LoginViewController: UIViewController {
     @IBOutlet private var passwordTextField: UITextField!
     @IBOutlet private var loginButton: UIButton!
     //MARK:Save to UserDefaults
-    let lastUserLoginKey = "lastSuccesLogin"
-    let checkForValid = CheckForValid()
+    private let lastUserLoginKey = "lastSuccesLogin"
+    private let checkForValid = CheckForValid()
     
     private func saveLastSuccessLoginInUserDefaults(login userLogin: String){ // Записывает последний усешный вход в программу
         UserDefaults.standard.setValue(userLogin, forKey: lastUserLoginKey)
