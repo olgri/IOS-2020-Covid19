@@ -13,7 +13,6 @@ class LoginViewController: UIViewController {
     @IBOutlet private var loginButton: UIButton!
     //MARK:Save to UserDefaults
     private let lastUserLoginKey = "lastSuccesLogin"
-    private let checkForValid = CheckForValid()
     
     private func saveLastSuccessLoginInUserDefaults(login userLogin: String){ // Записывает последний усешный вход в программу
         UserDefaults.standard.setValue(userLogin, forKey: lastUserLoginKey)
@@ -74,17 +73,26 @@ class LoginViewController: UIViewController {
         })
     }
     
+    
+    func isLoginCheckPass(loginText: String, passwordText: String) -> Bool{
+        var isPass = true
+        
+        if loginText.isEmpty {isPass = false}
+        if passwordText.isEmpty {isPass = false}
+        
+        return isPass
+    }
+    
     @objc private func userLoginEdit() {
-     /*   if !loginTextField.isEmpty && !passwordTextField.isEmpty{
+     if !loginTextField.isEmpty && !passwordTextField.isEmpty{
             loginButton.isEnabled = true
         } else {
             loginButton.isEnabled = false
         }
- */
-    //    if ((let loginText = loginTextField.text) && (let passwordText = passwordTextField.text)) {
-            
-      //  }
     }
+    
+    
+    
     
     override func viewDidAppear(_ animated: Bool) {
         if let lastLogin = loadLastSuccesLoginFromUserDefaults(){
@@ -96,6 +104,7 @@ class LoginViewController: UIViewController {
     }
 
     @objc private func userTryToLogin(){
+        if isLoginCheckPass(loginText: loginTextField.text!, passwordText: passwordTextField.text!) {
         if let loginSuccess = loginTextField.text {
             saveLastSuccessLoginInUserDefaults(login: loginSuccess)
         }
@@ -104,10 +113,11 @@ class LoginViewController: UIViewController {
         tabBarController.modalPresentationStyle = .fullScreen
 
         self.navigationController?.pushViewController(tabBarController, animated: true)
+     }
     }
 }
 
-/*extension UITextField {
+extension UITextField {
     var isEmpty: Bool {
         if let text = self.text, !text.isEmpty {
              return false
@@ -115,4 +125,3 @@ class LoginViewController: UIViewController {
         return true
     }
 }
-*/
