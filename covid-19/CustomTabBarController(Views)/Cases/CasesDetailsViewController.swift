@@ -19,10 +19,6 @@ var privateCase = Case(infected: 0, recovered: 0, country: "")
         self.view.addSubview(infectedTextField)
         
         self.view.addSubview(recoveredTextField)
-//        countryLabel.text = "Text"
-//        countryLabel.frame = CGRect(x: 10, y: 10, width: 100, height: 10)
-//        self.view.addSubview(countryLabel)
-            
     }
     
     

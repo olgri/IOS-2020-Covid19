@@ -19,7 +19,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
         let window = UIWindow(windowScene: windowScene)
-        let loginViewController = LoginViewController()
+        let loginViewController = LoginViewController(validation: ValidationService())
         let loginNavigationViewController = CustomNavigationController(rootViewController: loginViewController)
         window.rootViewController = loginNavigationViewController// Your initial view controller.
         window.makeKeyAndVisible()

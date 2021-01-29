@@ -11,6 +11,19 @@ class LoginViewController: UIViewController {
     @IBOutlet private var loginTextField: UITextField!
     @IBOutlet private var passwordTextField: UITextField!
     @IBOutlet private var loginButton: UIButton!
+    
+    private let validaion: ValidationService
+    
+    init(validation: ValidationService) {
+        self.validaion = ValidationService()
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        self.validaion = ValidationService()
+        super.init(coder: coder)
+    }
+    
     //MARK:Save to UserDefaults
     private let lastUserLoginKey = "lastSuccesLogin"
     
@@ -74,14 +87,6 @@ class LoginViewController: UIViewController {
     }
     
     
-    func isLoginCheckPass(loginText: String, passwordText: String) -> Bool{
-        var isPass = true
-        
-        if loginText.isEmpty {isPass = false}
-        if passwordText.isEmpty {isPass = false}
-        
-        return isPass
-    }
     
     @objc private func userLoginEdit() {
      if !loginTextField.isEmpty && !passwordTextField.isEmpty{
@@ -104,17 +109,21 @@ class LoginViewController: UIViewController {
     }
 
     @objc private func userTryToLogin(){
-        if isLoginCheckPass(loginText: loginTextField.text!, passwordText: passwordTextField.text!) {
-        if let loginSuccess = loginTextField.text {
-            saveLastSuccessLoginInUserDefaults(login: loginSuccess)
-        }
-        
+        do{
+        let username = try validaion.validateUsername(loginTextField.text)
+        let password = try validaion.validatePassword(passwordTextField.text)
+ 
+        saveLastSuccessLoginInUserDefaults(login: username)
+
         let tabBarController = CustomTabBarController()
         tabBarController.modalPresentationStyle = .fullScreen
 
         self.navigationController?.pushViewController(tabBarController, animated: true)
-     }
+  
+    } catch {
+        Messages().showAlertMsg(title: "Ошибка", message: error.localizedDescription, viewController: self)
     }
+  }
 }
 
 extension UITextField {
