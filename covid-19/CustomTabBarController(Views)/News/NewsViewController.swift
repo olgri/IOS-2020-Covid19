@@ -65,12 +65,13 @@ class NewsViewController: UIViewController, UICollectionViewDelegate, UICollecti
         cell.titleLabel.text = article.title
         cell.authorLabel.text = article.author
         // add bgimage
-        if let link = article.urlToImage {
-                cell.newsImageView.image = loadImageFromUrl(StringUrl: link)
-        } else {
-            //cell.newsImageView.image = UIImage(named: "no_image.png")
-            
-        }
+
+            DispatchQueue.global().async {
+                let newsImage = self.loadImageFromUrl(stringUrl: article.urlToImage) ?? UIImage(named: "no_image")
+                DispatchQueue.main.async {
+                    cell.newsImageView.image = newsImage
+                }
+            }
         return cell
     }
     
@@ -80,35 +81,18 @@ class NewsViewController: UIViewController, UICollectionViewDelegate, UICollecti
             UIApplication.shared.open(url)}
     }
     
-    func loadImageFromUrl(StringUrl: String) -> UIImage? {
-        if  let url = URL(string: StringUrl){
+    func loadImageFromUrl(stringUrl: String?) -> UIImage? {
+        if let linkToImage = stringUrl {
+        if  let url = URL(string: linkToImage){
             if let data = try? Data(contentsOf: url) {
-                    
-                if let image = UIImage(data: data) {
-                    return image
-                }
+                if let image = UIImage(data: data) { return image}
             }
         }
-            return nil
-    }
-
-    func applyMonoFilter(_ image: UIImage) -> UIImage? {
-      guard let data = image.pngData() else { return nil }
-      let inputImage = CIImage(data: data)
-      let context = CIContext(options: nil)
-      guard let filter = CIFilter(name: "CIPhotoEffectMono") else { return nil }
-      filter.setValue(inputImage, forKey: kCIInputImageKey)
-      guard
-        let outputImage = filter.outputImage,
-        let outImage = context.createCGImage(outputImage, from: outputImage.extent)
-      else {
         return nil
-      }
-      return UIImage(cgImage: outImage)
+        }
+        else {return nil}
     }
-    
 }
-
 // MARK: - UI Setup
 extension NewsViewController {
     private func setupUI() {
@@ -143,100 +127,4 @@ extension NewsViewController {
         
         return layout
     }
-    
-
 }
-
-    
-
-
-/*class NewsViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate{
-
-    
-
-    var articles: [Article] = []
-    let apiKey = "24bec7253bf0482b91794044d8ed95ea"
-    var newsCollectionView: UICollectionView?
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        let view = UIView()
-        view.backgroundColor = .white
-        self.title = "News"
-        let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
-            layout.sectionInset = UIEdgeInsets(top: 30, left: 30, bottom: 30, right: 30)
-            layout.itemSize = CGSize(width: 150, height: 150)
-        
-        newsCollectionView = UICollectionView(frame: self.view.frame, collectionViewLayout: layout)
-        newsCollectionView?.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "MyCell")
-        newsCollectionView?.backgroundColor = UIColor.white
-        newsCollectionView?.dataSource = self
-        newsCollectionView?.delegate = self
-        
-
-        self.view.addSubview(newsCollectionView ?? UICollectionView())
-}
-    
-
-func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-
-        return articles.count
-}
-
-func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-    
-    let currentArticle = articles[indexPath.item]
-    let myCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath)
-    myCell.backgroundColor = UIColor.red
-    // add bgimage
-    let newsImage = UIImageView(frame: myCell.frame)
-    if let link = currentArticle.urlToImage {
-        newsImage.load(StringUrl: link)
-    } else {
-        newsImage.image = UIImage(named: "no_image.png")}
-    myCell.addSubview(newsImage)
-    //Add title label
-    let titleLabel = UILabel(frame: CGRect(x: 55, y: 10, width: 100, height: 30))
-        titleLabel.font = UIFont.boldSystemFont(ofSize: 21)
-        titleLabel.textColor = .white
-    if let title = currentArticle.title {
-        titleLabel.text = title
-    } else {
-        titleLabel.text = ""
-    }
-
-    myCell.addSubview(titleLabel)
-    //Add Author label
-    let authorLabel = UILabel(frame: CGRect(x: 10, y: 100, width: 100, height: 20))
-        authorLabel.textColor = .white
-    if let author = currentArticle.author {
-        authorLabel.text = author
-    } else {
-        authorLabel.text = ""
-    }
-    
-    myCell.addSubview(authorLabel)
-    return myCell
-}
-    
-    func applySepialFilter(_ image: UIImage) -> UIImage? {
-      guard let data = image.pngData() else { return nil }
-      let inputImage = CIImage(data: data)
-      let context = CIContext(options: nil)
-      guard let filter = CIFilter(name: "CIPhotoEffectMono") else { return nil }
-      filter.setValue(inputImage, forKey: kCIInputImageKey)
-        
-          
-      guard
-        let outputImage = filter.outputImage,
-        let outImage = context.createCGImage(outputImage, from: outputImage.extent)
-      else {
-        return nil
-      }
-
-      return UIImage(cgImage: outImage)
-    }
-}
-
-*/

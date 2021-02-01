@@ -11,48 +11,44 @@ import XCTest
 
 class covid_19Tests: XCTestCase {
     
-    var validator: LoginViewController!
+    var validator: ValidationService!
 
     override func setUpWithError() throws {
-        validator = LoginViewController()
+        validator = ValidationService()
     }
 
     override func tearDownWithError() throws {
         validator = nil
     }
 
-    func testThatOnEmptyFieladsThen() throws {
-        let result = validator.isLoginCheckPass(loginText: "", passwordText: "")
-        XCTAssertFalse(result)
-    }
-    
-    func testThatLoginFilledAndPasswordNotFilled() {
-        let result = validator.isLoginCheckPass(loginText: "123456", passwordText: "")
-        XCTAssertFalse(result)
-    }
-    
-    func testThatLoginNotFilledAndPasswordFilled() {
-        let result = validator.isLoginCheckPass(loginText: "", passwordText: "123456")
-        XCTAssertFalse(result)
-    }
-    
-    func testThatPasswordMoreThan6Characters() {
-        let result = validator.isLoginCheckPass(loginText: "123456", passwordText: "12345")
-        XCTAssertFalse(result)
-    }
-    
-    func testThatUserEnterWrongPasswordMoreThan5Times(){
-        var validSum: Int = 0
-        for _ in 1...5 {
-            let result = validator.isLoginCheckPass(loginText: "", passwordText: "")
-            if !result {
-                validSum+=1
-            }
+    func testIfEmptyLoginFieldThenFalse() throws {
+        do {
+            try validator.validateUsername("")
+            XCTAssertFalse(true)
         }
-        let result = validator.isLoginCheckPass(loginText: "123456", passwordText: "123456")
-       
-        XCTAssertFalse((validSum == 5) && result)
-        
+        catch {
+            XCTAssertFalse(false)
+        }
+    }
+    
+    func testIfEmptyPasswordFieldThenTrue() throws {
+        do {
+            try validator.validatePassword("")
+            XCTAssertFalse(true)
+        }
+        catch {
+            XCTAssertFalse(false)
+        }
+    }
+    
+    func testIfLoginFieldLengthMoreThen3ChartsThenTrue() throws {
+        do {
+            try validator.validateUsername("333")
+            XCTAssertFalse(false)
+        }
+        catch {
+            XCTAssertFalse(false)
+        }
     }
 
 }

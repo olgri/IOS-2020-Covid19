@@ -35,8 +35,7 @@ class CasesViewController: UIViewController, UITableViewDelegate, UITableViewDat
         if let error = error{
             print(error)
         }
-//            if let respond = respond{
-//        }
+            
         if let data = data {
             let decoder = JSONDecoder()
 
@@ -63,8 +62,6 @@ class CasesViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         casesDetailViewController.privateCase = cases[indexPath.row]
-      //  self.navigationController?.pushViewController(casesDetailViewController, animated: true)
-       
     }
     
     
