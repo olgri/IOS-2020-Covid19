@@ -23,7 +23,7 @@ class covid_19Tests: XCTestCase {
 
     func testIfEmptyLoginFieldThenFalse() throws {
         do {
-            try validator.validateUsername("")
+            try _ = validator.validateUsername("")
             XCTAssertFalse(true)
         }
         catch {
@@ -33,7 +33,7 @@ class covid_19Tests: XCTestCase {
     
     func testIfEmptyPasswordFieldThenTrue() throws {
         do {
-            try validator.validatePassword("")
+            try _ = validator.validatePassword("")
             XCTAssertFalse(true)
         }
         catch {
@@ -43,8 +43,8 @@ class covid_19Tests: XCTestCase {
     
     func testIfLoginFieldLengthMoreThen3ChartsThenTrue() throws {
         do {
-            try validator.validateUsername("333")
-            XCTAssertFalse(false)
+            try _ = validator.validateUsername("4444")
+            XCTAssertFalse(true)
         }
         catch {
             XCTAssertFalse(false)

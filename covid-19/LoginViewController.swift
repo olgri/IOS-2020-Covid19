@@ -111,7 +111,7 @@ class LoginViewController: UIViewController {
     @objc private func userTryToLogin(){
         do{
         let username = try validaion.validateUsername(loginTextField.text)
-        let password = try validaion.validatePassword(passwordTextField.text)
+        let _ = try validaion.validatePassword(passwordTextField.text)
  
         saveLastSuccessLoginInUserDefaults(login: username)
 
