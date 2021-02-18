@@ -8,8 +8,8 @@
 import UIKit
 
 class LoginViewController: UIViewController {
-    @IBOutlet private var loginTextField: UITextField!
-    @IBOutlet private var passwordTextField: UITextField!
+    @IBOutlet private var loginTextField: StyledTextField!
+    @IBOutlet private var passwordTextField: StyledTextField!
     @IBOutlet private var loginButton: UIButton!
     
     private let validaion: ValidationService
@@ -47,33 +47,18 @@ class LoginViewController: UIViewController {
         mainView.backgroundColor = .white
 
         //add password
-        loginTextField = UITextField(frame: CGRect(x: 87, y: 278, width: 200, height: 35))
-        loginTextField.backgroundColor = .lightGray
-        loginTextField.textColor = .white
-        loginTextField.placeholder = "login"
-        loginTextField.borderStyle = UITextField.BorderStyle.roundedRect
-        loginTextField.keyboardType = UIKeyboardType.default
-        loginTextField.returnKeyType = UIReturnKeyType.done
-        loginTextField.clearButtonMode = UITextField.ViewMode.whileEditing
-        loginTextField.font = UIFont.boldSystemFont(ofSize: 21)
+        loginTextField = StyledTextField(frame: CGRect(x: 87, y: 278, width: 200, height: 35), placeholder: "login")
         loginTextField.addTarget(self, action: #selector(userLoginEdit), for: .editingChanged)
         mainView.addSubview(loginTextField)
+        
         //add login
-        passwordTextField = UITextField(frame: CGRect(x: 87, y: 353, width: 200, height: 35))
-        passwordTextField.backgroundColor = .lightGray
-        passwordTextField.textColor = .white
-        passwordTextField.placeholder = "password"
-        passwordTextField.borderStyle = UITextField.BorderStyle.roundedRect
-        passwordTextField.keyboardType = UIKeyboardType.default
-        passwordTextField.returnKeyType = UIReturnKeyType.done
-        passwordTextField.clearButtonMode = UITextField.ViewMode.whileEditing
-        passwordTextField.font = UIFont.boldSystemFont(ofSize: 21)
-        passwordTextField.isSecureTextEntry = true
+        passwordTextField = StyledTextField(frame: loginTextField.frame.offsetBy(dx: 100, dy: 100), placeholder: "password")
         passwordTextField.addTarget(self, action: #selector(userLoginEdit), for: .editingChanged)
         mainView.addSubview(passwordTextField)
+        
         //add textButton
         loginButton = UIButton(frame: CGRect(x: 160, y: 450, width: 55, height: 26))
-        loginButton.setTitleColor(.red, for: .normal)
+        loginButton.setTitleColor(.gray, for: .normal)
         loginButton.setTitle("Login", for: .normal)
         loginButton.addTarget(self, action: #selector(userTryToLogin), for: .touchUpInside)
         mainView.addSubview(loginButton)
@@ -85,19 +70,16 @@ class LoginViewController: UIViewController {
             mainView.frame = self.view.safeAreaLayoutGuide.layoutFrame 
         })
     }
-    
-    
-    
+
     @objc private func userLoginEdit() {
      if !loginTextField.isEmpty && !passwordTextField.isEmpty{
+            loginButton.setTitleColor(.red, for: .normal)
             loginButton.isEnabled = true
         } else {
+            loginButton.setTitleColor(.gray, for: .normal)
             loginButton.isEnabled = false
         }
     }
-    
-    
-    
     
     override func viewDidAppear(_ animated: Bool) {
         if let lastLogin = loadLastSuccesLoginFromUserDefaults(){
@@ -126,11 +108,18 @@ class LoginViewController: UIViewController {
   }
 }
 
-extension UITextField {
-    var isEmpty: Bool {
-        if let text = self.text, !text.isEmpty {
-             return false
-        }
-        return true
+
+/*
+extension LoginViewController {
+    private func setupUI() {
+        self.view.backgroundColor = .white
+        self.view.addSubview(collectionView)
+        
+        NSLayoutConstraint.activate([
+            collectionView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
+            collectionView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
+            collectionView.rightAnchor.constraint(equalTo: self.view.rightAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor)
+        ])
     }
-}
+}*/

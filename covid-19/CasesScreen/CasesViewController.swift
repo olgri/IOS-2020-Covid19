@@ -54,8 +54,6 @@ class CasesViewController: UIViewController, UITableViewDelegate, UITableViewDat
         casesTableView.dataSource = self
         casesTableView.delegate = self
         self.view.addSubview(casesTableView)
-   
-        
     }
 
     

@@ -16,7 +16,6 @@ class NewsViewController: UIViewController, UICollectionViewDelegate, UICollecti
         super.viewDidLoad()
         setupUI()
         getNewsData()
-        
     }
     
     private func getNewsData(){
@@ -96,11 +95,7 @@ class NewsViewController: UIViewController, UICollectionViewDelegate, UICollecti
 // MARK: - UI Setup
 extension NewsViewController {
     private func setupUI() {
-        if #available(iOS 13.0, *) {
-            overrideUserInterfaceStyle = .light
-        }
         self.view.backgroundColor = .white
-        
         self.view.addSubview(collectionView)
         
         NSLayoutConstraint.activate([
